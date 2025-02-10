@@ -15,5 +15,5 @@ router.post(
   //validateRequest,
   authController.login
 );
-
+router.post("/verifyToken", authController.verifyToken);
 export default router;

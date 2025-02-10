@@ -23,39 +23,10 @@ const userController = {
         email,
         password: hashedPassword,
       });
-       console.log(user , "user");
-       
-      // Create JWT token
-      // const token = jwt.sign(
-      //   { id: user._id, role: user.email },
-      //   process.env.JWT_SECRET ,
-      //   { expiresIn: '30d' }
-      // );
 
-      // // // Set cookie options
-      // const cookieOptions = {
-      //   expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-      //     httpOnly: true,
-      //     secure: process.env.NODE_ENV === 'production',
-        
-      // };
 
-      // // Send token in cookie
-      // res.cookie('token', token, cookieOptions);
-
-      // res.status(201).json({
-      //   success: true,
-      //   token,
-      //   user: {
-      //     id: user.id,
-      //     name: user.name,
-      //     email: user.email,
-      //     role: user.role,
-      //   },
-      // });
       res.status(200).json({
         success: true,
-        data: user,
       });
     } catch (error) {
       next(error);
@@ -78,10 +49,10 @@ const userController = {
     }
   },
   logout: (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('ecobuy24_token');
     res.status(200).json({ success: true, message: 'Logged out successfully' });
   },
-  
+
 };
 
 export default userController;

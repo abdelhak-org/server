@@ -18,25 +18,23 @@ const productController = {
 
   getAllProducts: async (req, res, next) => {
     const { category = "", title = "", address = "" } = req.query;
-    const query = {};
-    
+    const query = {isActive: true , isAproved: true};
+
     // Build query object based on provided filters
     if (category) query.category = new RegExp(category, 'i');
     if (title) query.title = new RegExp(title, 'i');
     if (address) query.address = new RegExp(address, 'i');
-    
+
     try {
-      console.log("API request received at getAllProducts");
-      console.log("Filter query:", query);
-      
+
       const products = await Product.find(query)
         .catch(err => {
           console.error("Database query error:", err);
           throw new APIError('Database query failed', 500);
         });
-      
+
       console.log(`Found ${products?.length || 0} products`);
-      
+
       res.json({
         success: true,
         data: products

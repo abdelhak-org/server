@@ -2,11 +2,16 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
+  userId :{
+    type: mongoose.Schema.Types.ObjectId,
+    required: true ,
+  },
+
   title: {
     type: String,
     required: true,
   },
-  
+
   desc: {
     type: String,
     required: true,
@@ -15,7 +20,7 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  
+
   category: {
     type: String,
     required: true,
@@ -23,7 +28,15 @@ const productSchema = new mongoose.Schema({
   images: {
     type: String,
   },
- 
+
+  isActive :{
+    type: Boolean,
+    default: true,
+  },
+  isAproved :{
+    type: Boolean,
+    default: false,
+  },
 },
 {
   timestamps: true,

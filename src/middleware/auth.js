@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-
+import User from "../models/user.js"
 const secretKey = process.env.JWT_SECRET ;
 
 export const authenticateToken = (req, res, next) => {
@@ -19,5 +19,27 @@ export const authenticateToken = (req, res, next) => {
     });
   } catch (error) {
     return res.status(500).json({ message: "Authentication error" });
+  }
+};
+
+
+// verify authentification
+export const verifyToken = async (req, res, next) => {
+  const token = req.cookies.ecobuy24_token;
+  if (!token) return res.status(401).json({ message: "Access Denied" });
+
+  try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      const user = await User.findById(decoded.id);
+      console.log(user, "user from verifytoken")
+      if (!user) {
+        throw new APIError('No user found with this id', 404);
+      }
+
+      req.user = user;
+      next();
+  } catch (error) {
+      res.status(400).json({ message: "Invalid Token" });
   }
 };
