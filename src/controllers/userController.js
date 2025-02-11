@@ -32,10 +32,21 @@ const userController = {
       next(error);
     }
   },
+  getUsers: async (req, res, next) => {
+    try {
+      const users = await User.find();
+      res.json({
+        success: true,
+        data: users,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
   getUser: async (req, res, next) => {
     try {
-      const user = await User.findById(req.params.id);
+      const user = await User.findById(req.params.id).select("-password");
       if (!user) {
         throw new APIError("User not found", 404);
       }

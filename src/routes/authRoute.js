@@ -2,8 +2,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import authController from "../controllers/authController.js";
-import validateRequest from "../middleware/validateRequest.js";
-
+import {verifyToken ,authenticateToken} from "../middleware/auth.js";
 const router = Router();
 
 router.post(
@@ -15,5 +14,5 @@ router.post(
   //validateRequest,
   authController.login
 );
-router.post("/verifyToken", authController.verifyToken);
+router.post("/dashboard", authController.dashboard);
 export default router;

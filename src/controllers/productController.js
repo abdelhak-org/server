@@ -15,7 +15,7 @@ const productController = {
       next(error);
     }
   },
-
+// Get all products
   getAllProducts: async (req, res, next) => {
     const { category = "", title = "", address = "" } = req.query;
     const query = {isActive: true , isAproved: true};
@@ -44,6 +44,25 @@ const productController = {
       next(error);
     }
   },
+  // Get products by user id
+  getProductsByUserId: async (req, res, next) => {
+    const { userId } = req.params;
+    try {
+      const products = await Product.find({ userId: userId });
+      console.log(`Found ${products?.length || 0} products for user ${userId}`);
+      if (!products) {
+        throw new APIError('Products not found', 404);
+      }
+
+      res.json({
+        success: true,
+        data: products
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  // Get single product
 
   getProductById: async (req, res, next) => {
     try {
@@ -60,7 +79,7 @@ const productController = {
       next(error);
     }
   },
-
+// Update product
   updateProduct: async (req, res, next) => {
     try {
       const updatedProduct = await Product.findByIdAndUpdate(
@@ -80,7 +99,7 @@ const productController = {
       next(error);
     }
   },
-
+// Delete product
   deleteProduct: async (req, res, next) => {
     try {
       const deletedProduct = await Product.findByIdAndDelete(req.params.id);
