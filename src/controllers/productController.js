@@ -17,8 +17,8 @@ const productController = {
   },
 // Get all products
   getAllProducts: async (req, res, next) => {
-    const { category = "", title = "", address = "" } = req.query;
-    const query = {isActive: true , isAproved: true};
+    const { category = "", title = "", address = "", currentPage = 1, pageSize = 12} = req.query;
+    const query = { isActive: true, isAproved: true };
 
     // Build query object based on provided filters
     if (category) query.category = new RegExp(category, 'i');
@@ -26,8 +26,13 @@ const productController = {
     if (address) query.address = new RegExp(address, 'i');
 
     try {
+      const skip = (currentPage - 1) * pageSize;
+      const totalProducts = await Product.countDocuments(query);
+      const totalPages = Math.ceil(totalProducts / pageSize);
 
       const products = await Product.find(query)
+        .skip(skip)
+        .limit(pageSize)
         .catch(err => {
           console.error("Database query error:", err);
           throw new APIError('Database query failed', 500);
@@ -37,7 +42,13 @@ const productController = {
 
       res.json({
         success: true,
-        data: products
+        data: products,
+        pagination: {
+          currentPage: parseInt(currentPage, 12),
+          pageSize: parseInt(pageSize, 12),
+          totalPages,
+          totalProducts
+        }
       });
     } catch (error) {
       console.error("Error in getAllProducts:", error);

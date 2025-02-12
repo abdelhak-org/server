@@ -17,7 +17,7 @@ router.post("/products", [
   body("title").notEmpty().withMessage("post title is required"),
   body("price").isNumeric().withMessage("Valid price is required"),
   body("description").notEmpty().withMessage("Description is required"),
-], createProduct);
+],authenticateToken, createProduct);
 
 // Update product
 router.put("/products/:id", [

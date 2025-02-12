@@ -20,7 +20,7 @@ router.post(
 //get user
 router.get("/users", userController.getUsers);
 router.get("/users/:id",authenticateToken, userController.getUser);
-router.post("api/v1/logout", userController.logout);
+router.post("api/v1/logout",authenticateToken, userController.logout);
 
 
 export default router;
