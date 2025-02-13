@@ -13,15 +13,18 @@ router.get("/products/:id", getProductsByUserId);
 // Get products by user id
 router.get("/products/user/:userId",  getProductsByUserId);
 // Create product
-router.post("/products", [
+router.post("/products",  createProduct);
+/**
+ *
+ * [
   body("title").notEmpty().withMessage("post title is required"),
   body("price").isNumeric().withMessage("Valid price is required"),
   body("description").notEmpty().withMessage("Description is required"),
-],authenticateToken, createProduct);
-
+],
+ */
 // Update product
 router.put("/products/:id", [
-  body("name").optional().notEmpty(),
+  body("title").optional().notEmpty(),
   body("price").optional().isNumeric(),
   body("description").optional().notEmpty(),
 ], authenticateToken, updateProduct);

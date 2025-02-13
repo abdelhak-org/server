@@ -1,24 +1,27 @@
 import Product from '../models/product.js';
 import APIError from '../utils/apiError.js';
-
+import jwt from 'jsonwebtoken';
 const productController = {
 
   createProduct: async (req, res, next) => {
-    try {
-      const newProduct = await Product.create(req.body);
 
+    try {
+
+        const newProduct = await Product.create({...req.body , userId:"65d23f8b9c1e3a001f2a4b6c" , isActive: true, isAproved: true });
+      // res with new product
       res.status(201).json({
         success: true,
-        data: newProduct
+         data: newProduct
       });
+
     } catch (error) {
       next(error);
     }
   },
 // Get all products
   getAllProducts: async (req, res, next) => {
-    const { category = "", title = "", address = "", currentPage = 1, pageSize = 12} = req.query;
-    const query = { isActive: true, isAproved: true };
+    const { category = "", title = "", address = "", currentPage = 1, pageSize = 10} = req.query;
+    const query = { isActive: true };
 
     // Build query object based on provided filters
     if (category) query.category = new RegExp(category, 'i');
@@ -44,8 +47,8 @@ const productController = {
         success: true,
         data: products,
         pagination: {
-          currentPage: parseInt(currentPage, 12),
-          pageSize: parseInt(pageSize, 12),
+          currentPage: parseInt(currentPage, 10),
+          pageSize: parseInt(pageSize, 10),
           totalPages,
           totalProducts
         }
