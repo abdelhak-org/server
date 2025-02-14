@@ -20,7 +20,7 @@ const productController = {
   },
 // Get all products
   getAllProducts: async (req, res, next) => {
-    const { category = "", title = "", address = "", currentPage = 1, pageSize = 10} = req.query;
+    const { category = "", title = "", address = "", currentPage = 1, pageSize = 12} = req.query;
     const query = { isActive: true };
 
     // Build query object based on provided filters
@@ -47,8 +47,8 @@ const productController = {
         success: true,
         data: products,
         pagination: {
-          currentPage: parseInt(currentPage, 10),
-          pageSize: parseInt(pageSize, 10),
+          currentPage: parseInt(currentPage,10),
+          pageSize: parseInt(pageSize,10),
           totalPages,
           totalProducts
         }
@@ -80,14 +80,19 @@ const productController = {
 
   getProductById: async (req, res, next) => {
     try {
-      const product = await Product.findById(req.params.id);
+      const id =  req.params.id;
+      if (!id) {
+        return next(new APIError('Product ID is required', 400));
+      }
+      const product = await Product.findById(id);
+      console.log(product, "product");
+
       if (!product) {
         throw new APIError('Product not found', 404);
       }
-
       res.json({
         success: true,
-        data: product
+        data:product
       });
     } catch (error) {
       next(error);

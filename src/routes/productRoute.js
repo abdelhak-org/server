@@ -9,7 +9,7 @@ const { getAllProducts, getProductById, createProduct, updateProduct, deleteProd
 router.get("/products", getAllProducts);
 
 // Get single product
-router.get("/products/:id", getProductsByUserId);
+router.get("/products/:id", getProductById);
 // Get products by user id
 router.get("/products/user/:userId",  getProductsByUserId);
 // Create product
