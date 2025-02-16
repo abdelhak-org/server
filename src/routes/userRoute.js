@@ -18,23 +18,22 @@ const router = Router();
 router.get("/users", userController.getUsers);
 
 // get user by id
-// router.get("/users/:id", userController.getUser);
+//  router.get("/users/:id", userController.getUserById);
 
 // verifyuser
 router.get("/users/me", userController.me)
 
 // create user
-router.post("users/signup",
-  [
-    body("email").isEmail().withMessage("Valid email is required"),
-    body("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters"),
-    body("name").notEmpty().withMessage("Name is required"),
-  ],
+router.post("/users/signup",
   userController.signUp
 );
-// user logout
 
 
 export default router;
+// [
+//   body("email").isEmail().withMessage("Valid email is required"),
+//   body("password")
+//     .isLength({ min: 6 })
+//     .withMessage("Password must be at least 6 characters"),
+//   body("name").notEmpty().withMessage("Name is required"),
+// ],

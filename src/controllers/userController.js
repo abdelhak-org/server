@@ -13,7 +13,6 @@ import jwt from "jsonwebtoken"
 const userController = {
 
   me: async (req, res, next) => {
-    console.log("clicked from me")
     try {
       const token = req.cookies.ecobuy24_token;
       if (!token) return res.status(401).json({ message: "Access Denied" });
@@ -49,6 +48,7 @@ const userController = {
   signUp: async (req, res, next) => {
     try {
       const { name, email, password } = req.body;
+
       const existingUser = await User.findOne({ email }).select("-password");
       if (existingUser) {
         return next(new APIError("User already exists", 400));
@@ -70,21 +70,25 @@ const userController = {
     }
   },
 
-  // getUser: async (req, res, next) => {
-  //   try {
-  //     const user = req.user;
-  //     if (!user) {
-  //       return next(new APIError("User not found", 404));
-  //     }
+  getUserById: async (req, res, next) => {
+    try {
+      const userId = req.params.id;
+      const user = await  User.findById(userId);
 
-  //     res.status(200).json({
-  //       success: true,
-  //       data: user,
-  //     });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // },
+      if (!user) {
+        return next(new APIError("User not found", 404));
+      }
+
+      res.status(200).json({
+        success: true,
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  
+
 
 };
 

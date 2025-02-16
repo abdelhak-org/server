@@ -41,9 +41,8 @@ app.use(cors({
 }))
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
-app.use(mongoSanitize());
-app.use(xss());
-
+//app.use(mongoSanitize());
+//.use(xss());
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -55,12 +54,10 @@ const limiter = rateLimit({
 app.get('/api/v1', (req, res) => {
   res.send('Hello World');
 });
-
 // API Routes
 app.use('/api/v1', authRouter);
 app.use('/api/v1', productRouter);
 app.use('/api/v1', userRouter);
-
 //
 //
 // export default app;
