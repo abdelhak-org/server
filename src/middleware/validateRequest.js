@@ -39,7 +39,7 @@ export const validateUser = [
 export const validateUserId = [
   param("id").isMongoId().withMessage("Invalid user ID"),
 ];
-
+verifiedUser
 export const validatePagination = [
   query("page").optional().isInt({ min: 1 }).withMessage("Invalid page number"),
   query("limit")

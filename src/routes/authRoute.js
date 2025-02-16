@@ -2,17 +2,24 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import authController from "../controllers/authController.js";
-import {verifyToken ,authenticateToken} from "../middleware/auth.js";
+import {verifyToken } from "../middleware/auth.js";
 const router = Router();
+// *  post/users/login
+// *  post/verifyken/users/logout
+
+
+
+
 
 router.post(
-  "/login",
+  "/users/login",
   [
     body("email").isEmail().withMessage("Valid email is required"),
     body("password").notEmpty().withMessage("Password is required"),
   ],
-  //validateRequest,
   authController.login
 );
-router.post("/dashboard", authController.dashboard);
-export default router;
+router.post("/users/logout", authController.logout);
+
+
+export default  router

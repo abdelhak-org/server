@@ -3,7 +3,11 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import User from '../models/user.js';
 import APIError from "../utils/apiError.js";
+/**
+ *  login controller
+ *  logout controller
 
+*/
 const authController = {
 
   login: async (req, res, next) => {
@@ -52,27 +56,13 @@ const authController = {
       next(error);
     }
   },
-  dashboard: async (req, res, next) => {
-    try {
-        // Get token from headers
-        const token = req.headers.authorization?.split(" ")[1];
-        if (!token) {
-          return res.status(401).json({ message: "Authentication required" });
-        }
-
-        // Synchronously verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        const user = await User.findById(decoded.id).select('-password');
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-
-        res.status(200).json({success: true, user});
-    } catch (error) {
-      res.status(500).json({ message: 'Server error' });
-    }
+  logout: (req, res) => {
+    res.clearCookie('ecobuy24_token');
+    res.status(200).json({ success: true, message: 'Logged out successfully' });
   }
+
+
+
 
 };
 

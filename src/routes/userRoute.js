@@ -2,12 +2,29 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import userController from "../controllers/userController.js";
-import {authenticateToken} from "../middleware/auth.js";
+import { verifyToken , authenticateToken} from "../middleware/auth.js";
 const router = Router();
+/**
+ * base url // http://localhost:3000/api/v1
+ *  get /users
+ *  get/users/:id
+ *  get/ verifyToken/users/me
 
-// register user
-router.post(
-  "/signup",
+ *  update/verifyToken/users/:id
+ *  delete/verifyToken/users/:id
+ *
+*/
+// get users
+router.get("/users", userController.getUsers);
+
+// get user by id
+// router.get("/users/:id", userController.getUser);
+
+// verifyuser
+router.get("/users/me", userController.me)
+
+// create user
+router.post("users/signup",
   [
     body("email").isEmail().withMessage("Valid email is required"),
     body("password")
@@ -15,12 +32,9 @@ router.post(
       .withMessage("Password must be at least 6 characters"),
     body("name").notEmpty().withMessage("Name is required"),
   ],
-  userController.createUser
+  userController.signUp
 );
-//get user
-router.get("/users", userController.getUsers);
-router.get("/users/:id",authenticateToken, userController.getUser);
-router.post("api/v1/logout",authenticateToken, userController.logout);
+// user logout
 
 
 export default router;

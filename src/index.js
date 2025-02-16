@@ -10,7 +10,6 @@ import authRouter from './routes/authRoute.js';
 import dotenv from 'dotenv';
 import productRouter from './routes/productRoute.js';
 import userRouter from './routes/userRoute.js';
-import { verifyToken} from './middleware/auth.js';
 dotenv.config();
 
 const app = express();
@@ -35,7 +34,7 @@ process.on('SIGINT', async () => {
 });
 
 // Security middleware
-app.use(helmet());
+//app.use(helmet());
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true,
