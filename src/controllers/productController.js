@@ -1,13 +1,25 @@
 import Product from '../models/product.js';
 import APIError from '../utils/apiError.js';
 import jwt from 'jsonwebtoken';
+import User from "../models/user.js";
+
 const productController = {
 
   createProduct: async (req, res, next) => {
-
     try {
+      const token =  req.cookies.ecobuy24_token;
+      console.log(token)
+      if (!token) return res.status(401).json({ message: "Access Denied" });
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        const newProduct = await Product.create({...req.body , userId:"65d23f8b9c1e3a001f2a4b6c" , isActive: true, isAproved: true });
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        console.log(user , "no user  from me endpoint")
+        throw new APIError('No user found with this id', 404);
+      }
+        console.log(user ,"user from createUser")
+
+        const newProduct = await Product.create({...req.body , userId:user._id , isActive: true, isAproved: true });
       // res with new product
       res.status(201).json({
         success: true,
@@ -34,6 +46,7 @@ const productController = {
       const totalPages = Math.ceil(totalProducts / pageSize);
 
       const products = await Product.find(query)
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(pageSize)
         .catch(err => {
@@ -62,7 +75,8 @@ const productController = {
   getProductsByUserId: async (req, res, next) => {
     const { userId } = req.params;
     try {
-      const products = await Product.find({ userId: userId });
+      const products = await Product.find({ userId: userId }).sort({ createdAt: -1 })
+      ;
       console.log(`Found ${products?.length || 0} products for user ${userId}`);
       if (!products) {
         throw new APIError('Products not found', 404);
