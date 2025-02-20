@@ -4,7 +4,8 @@ import { body } from "express-validator";
 import productController  from "../controllers/productController.js";
 import {verifyToken , authenticateToken} from "../middleware/auth.js";
 const router = Router();
-const { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct , getProductsByUserId } = productController;
+const { getAllProducts, getProductById, createProduct,
+   updateProduct, deleteProduct , getProductsByUserId  , deactivateProduct} = productController;
 
 /**
  *  get /products
@@ -36,6 +37,8 @@ const { getAllProducts, getProductById, createProduct, updateProduct, deleteProd
   body("price").optional().isNumeric(),
   body("description").optional().notEmpty(),
   ] , updateProduct);
+  // deactivate product
+  router.patch("/products/status/:id", deactivateProduct)
 // Delete product
   router.delete("/products/:id", deleteProduct);
 

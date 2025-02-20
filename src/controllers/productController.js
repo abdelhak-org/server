@@ -132,8 +132,30 @@ const productController = {
       next(error);
     }
   },
+  // deactivate product
+  deactivateProduct: async (req, res, next) => {
+     console.log(  req.params.id , "params")
+    try {
+      const product = await Product.findById(req.params.id);
+
+      if (!product) {
+        throw new APIError('Product not found', 404);
+      }
+
+      product.isActive = !product.isActive;
+      const updatedProduct = await product.save();
+
+      res.json({
+        success: true,
+        data: updatedProduct
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 // Delete product
   deleteProduct: async (req, res, next) => {
+    console.log(req.params.id , "params")
     try {
       const deletedProduct = await Product.findByIdAndDelete(req.params.id);
       if (!deletedProduct) {
