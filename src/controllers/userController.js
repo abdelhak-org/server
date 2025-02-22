@@ -20,13 +20,8 @@ const userController = {
 
       const user = await User.findById(decoded.id);
       if (!user) {
-        console.log(user , "no user  from me endpoint")
         throw new APIError('No user found with this id', 404);
       }
-     // const user = req.user;
-      // if (!user) {
-      //   return res.status(404).json({ message: "User not found" });
-      // }
       res.status(200).json({ success: true, user });
     } catch (error) {
       next(error);
@@ -87,8 +82,54 @@ const userController = {
       next(error);
     }
   },
-  
 
+  updateUser: async (req, res, next) => {
+    try {
+      const userId = req.params.id;
+      const { password, name } = req.body;
+      const user = await User.findById(userId);
+      if (!user) {
+        return next(new APIError("User not found", 404));
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        throw new APIError('Invalid credentials', 401);
+      }
+
+      // Update user details here
+      if (password) {
+        user.password = await bcrypt.hash(password, 12);
+      }
+      user.name = name;
+      await user.save();
+
+      res.status(200).json({
+        success: true,
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  deleteUser: async (req, res, next) => {
+    try {
+      const userId = req.params.id;
+      const user = await User.findById(userId);
+      if (!user) {
+        return next(new APIError("User not found", 404));
+      }
+
+      await user.remove();
+
+      res.status(200).json({
+        success: true,
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 
 };
 

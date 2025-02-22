@@ -2,7 +2,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import userController from "../controllers/userController.js";
-import { verifyToken , authenticateToken} from "../middleware/auth.js";
+import { verifyToken, authenticateToken } from "../middleware/auth.js";
 const router = Router();
 /**
  * base url // http://localhost:3000/api/v1
@@ -14,19 +14,26 @@ const router = Router();
  *  delete/verifyToken/users/:id
  *
 */
-// get users
-router.get("/users", userController.getUsers);
-
-// get user by id
-//  router.get("/users/:id", userController.getUserById);
-
-// verifyuser
-router.get("/users/me", userController.me)
-
 // create user
 router.post("/users/signup",
   userController.signUp
 );
+// get users
+router.get("/users", userController.getUsers);
+
+// get user by id
+router.get("/users/:id", userController.getUserById);
+
+
+// update user
+router.put("/users/:id", userController.updateUser);
+
+// delete user
+router.delete("/users/:id", userController.deleteUser);
+
+// verifyuser
+router.get("/users/me", userController.me)
+
 
 
 export default router;
