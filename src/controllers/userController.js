@@ -15,14 +15,8 @@ const userController = {
   me: async (req, res, next) => {
     try {
       const token = req.cookies.ecobuy24_token;
-      if (!token) return res.status(401).json({ message: "Access Denied" });
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      const user = await User.findById(decoded.id);
-      if (!user) {
-        throw new APIError('No user found with this id', 404);
-      }
-      res.status(200).json({ success: true, user });
+      const user = req.user;
+      res.status(200).json({ success: true, user , token});
     } catch (error) {
       next(error);
     }
@@ -86,19 +80,10 @@ const userController = {
   updateUser: async (req, res, next) => {
     try {
       const userId = req.params.id;
-      const { password, name } = req.body;
+      const {  name } = req.body;
       const user = await User.findById(userId);
       if (!user) {
         return next(new APIError("User not found", 404));
-      }
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        throw new APIError('Invalid credentials', 401);
-      }
-
-      // Update user details here
-      if (password) {
-        user.password = await bcrypt.hash(password, 12);
       }
       user.name = name;
       await user.save();

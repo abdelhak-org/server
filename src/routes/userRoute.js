@@ -22,7 +22,7 @@ router.post("/users/signup",
 router.get("/users", userController.getUsers);
 
 // get user by id
-router.get("/users/:id", userController.getUserById);
+//router.get("/users/:id", userController.getUserById);
 
 
 // update user
@@ -32,7 +32,7 @@ router.put("/users/:id", userController.updateUser);
 router.delete("/users/:id", userController.deleteUser);
 
 // verifyuser
-router.get("/users/me", userController.me)
+router.get("/users/me",verifyToken, userController.me)
 
 
 

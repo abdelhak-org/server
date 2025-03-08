@@ -45,9 +45,9 @@ const authController = {
       res.cookie('ecobuy24_token', token, cookieOptions);
       res.status(201).json({
         success: true,
-        token,
+       //token,
         user: {
-          id: user.id,
+          _id: user._id,
           name: user.name,
           email: user.email,
         },
@@ -57,11 +57,47 @@ const authController = {
     }
   },
   logout: (req, res) => {
-    res.clearCookie('ecobuy24_token');
-    res.status(200).json({ success: true, message: 'Logged out successfully' });
+    try {
+        res.clearCookie('ecobuy24_token', { httpOnly: true, secure: true, sameSite: 'Strict' });
+        res.status(200).json({ success: true, message: 'Logged out successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Logout failed', error: error.message });
+    }
+}  ,
+restPassword: async (req, res, next) => {
+const { email } = req.body;
+try{
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new APIError('User not found', 404);
   }
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: '10m',
+  });
 
+  const resetUrl = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/auth/resetpassword/${token}`;
 
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetUrl}.\nIf you didn't forget your password, please ignore this email!`;
+
+  await sendEmail({
+    email: user.email,
+    subject: 'Your password reset token (valid for 10 min)',
+    message,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Token sent to email!',
+  });
+
+}
+catch (error) {
+  next(error);
+}
+
+}
 
 
 };
