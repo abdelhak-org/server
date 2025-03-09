@@ -31,50 +31,60 @@ const productController = {
     }
   },
 // Get all products
-  getAllProducts: async (req, res, next) => {
-    const { category = "", title = "", address = "", currentPage = 1, pageSize = 12, userId, isAproved, minPrice, maxPrice, sortBy="newest" } = req.query;
-    const query = { isActive: true };
 
-    // Build query object based on provided filters
-    if (category) query.category = new RegExp(category, 'i');
-    if (title) query.title = new RegExp(title, 'i');
-    if (address) query.address = new RegExp(address, 'i');
-    if (minPrice) query.price = { ...query.price, $gte: minPrice };
-    if (maxPrice) query.price = { ...query.price, $lte: maxPrice };
-    if (userId) query.userId = userId;
-    if (isAproved !== undefined) query.isAproved = isAproved;
-    // Determine sort order based on sortBy parameter
-    let sortOrder = { updatedAt: -1 }; // Default to newest first
-    if (sortBy === 'oldest') {
-      sortOrder = { updatedAt: 1 };
-    }
+    getAllProducts: async (req, res, next) => {
+      const { category = "", title = "", address = "", currentPage = 1, pageSize = 12, userId, isAproved, minPrice, maxPrice, sortBy="newest" } = req.query;
+      const query = { isActive: true };
 
-    try {
-      const skip = (currentPage - 1) * pageSize;
-      const totalProducts = await Product.countDocuments(query);
-      const totalPages = Math.ceil(totalProducts / pageSize);
+      // Build query object based on provided filters
+      if (category) query.category = new RegExp(category, 'i');
+      if (title) query.title = new RegExp(title, 'i');
+      if (address) query.address = new RegExp(address, 'i');
+      if (minPrice) query.price = { ...query.price, $gte: minPrice };
+      if (maxPrice) query.price = { ...query.price, $lte: maxPrice };
+      if (userId) query.userId = userId;
+      if (isAproved !== undefined) query.isAproved = isAproved;
+      // Determine sort order based on sortBy parameter
+      const sortOrder = { updatedAt: -1 }; // Default to newest first
+      if (sortBy === 'oldest') {
+        sortOrder.updatedAt = 1;
+      } else if (sortBy === 'priceAsc') {
+        sortOrder.price = 1;
+      } else if (sortBy === 'priceDesc') {
+        sortOrder.price = -1;
+      } else if (sortBy === 'newest') {
+        sortOrder.updatedAt = -1;
+      }
+      try {
+        const skip = (currentPage - 1) * pageSize;
+        const totalProducts = await Product.countDocuments(query);
+        console.log(totalProducts)
+        console.log(totalProducts, "totalProducts")
+        const totalPages = Math.ceil(totalProducts / pageSize);
+
+        const products = await Product.find(query)
+          .sort(sortOrder)
+          .skip(skip)
+          .limit(pageSize);
+
+        //console.log(`Found ${products?.length || 0} products`);
+        res.json({
+          success: true,
+          data: products,
+          pagination: {
+            currentPage: parseInt(currentPage, 10),
+            pageSize: parseInt(pageSize, 10),
+            totalPages,
+            totalProducts
+          }
+        });
+      } catch (error) {
+        console.error("Error in getAllProducts:", error);
+        next(error);
+      }
+      
 
 
-      const products = await Product.find(query)
-        .sort(sortOrder)
-        .skip(skip)
-        .limit(pageSize);
-
-      console.log(`Found ${products?.length || 0} products`);
-      res.json({
-        success: true,
-        data: products,
-        pagination: {
-          currentPage: parseInt(currentPage, 10),
-          pageSize: parseInt(pageSize, 10),
-          totalPages,
-          totalProducts
-        }
-      });
-    } catch (error) {
-      console.error("Error in getAllProducts:", error);
-      next(error);
-    }
   },
   // Get products by user id
   getProductsByUserId: async (req, res, next) => {

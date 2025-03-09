@@ -45,7 +45,6 @@ const authController = {
       res.cookie('ecobuy24_token', token, cookieOptions);
       res.status(201).json({
         success: true,
-       //token,
         user: {
           _id: user._id,
           name: user.name,
