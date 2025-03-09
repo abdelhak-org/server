@@ -58,8 +58,6 @@ const productController = {
       try {
         const skip = (currentPage - 1) * pageSize;
         const totalProducts = await Product.countDocuments(query);
-        console.log(totalProducts)
-        console.log(totalProducts, "totalProducts")
         const totalPages = Math.ceil(totalProducts / pageSize);
 
         const products = await Product.find(query)
@@ -67,7 +65,6 @@ const productController = {
           .skip(skip)
           .limit(pageSize);
 
-        //console.log(`Found ${products?.length || 0} products`);
         res.json({
           success: true,
           data: products,
@@ -82,7 +79,6 @@ const productController = {
         console.error("Error in getAllProducts:", error);
         next(error);
       }
-      
 
 
   },
