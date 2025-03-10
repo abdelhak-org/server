@@ -10,7 +10,7 @@ import authRouter from './routes/authRoute.js';
 import dotenv from 'dotenv';
 import productRouter from './routes/productRoute.js';
 import userRouter from './routes/userRoute.js';
-import s3Router from './routes/s3Route.js';
+// import s3Router from './routes/s3Route.js';
 dotenv.config();
 
 const app = express();
@@ -60,7 +60,7 @@ app.use('/api/v1', authRouter);
 app.use('/api/v1', productRouter);
 app.use('/api/v1', userRouter);
 app.use('/api/v1', userRouter);
-app.use('/api/v1', s3Router);
+//app.use('/api/v1', s3Router);
 
 
 //
