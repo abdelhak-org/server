@@ -21,9 +21,18 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  images: {
+  img: {
     type: String,
   },
+  address:{
+    type:String,
+    required:true
+  },
+  contact:{
+    type:String,
+    required:false
+  },
+  
   isActive: {
     type: Boolean,
     default: true,

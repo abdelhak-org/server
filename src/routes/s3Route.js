@@ -1,12 +1,18 @@
-// import { Router as router } from "express";
-// import upload from '../../s3Config.js';
+import { Router  } from "express";
+import multer from "multer";
+import {s3Controller} from "../controllers/s3Controller.js"
+const router = Router();
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 100 * 1024 * 1024 }, // Increase file size limit to 50MB
+});
 
 
-// router.post('/upload', upload.single('file'), (req, res) => {
-//     if (!req.file) {
-//         return res.status(400).json({ error: 'No file uploaded' });
-//     }
-//     res.json({ fileUrl: req.file.location });
-// });
+router.post('/products/upload', upload.single('image') , s3Controller.uploadImage);
+router.delete('/products/upload', s3Controller.deleteImage)
 
-// export default router;
+
+
+
+export default router

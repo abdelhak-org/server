@@ -1,11 +1,7 @@
-// src/routes/productRoute.js
-import { Router } from "express";
+import { Router  } from "express";
 import { body } from "express-validator";
-import productController  from "../controllers/productController.js";
-import {verifyToken , authenticateToken} from "../middleware/auth.js";
-const router = Router();
-const { getAllProducts, getProductById, createProduct,
-   updateProduct, deleteProduct , getProductsByUserId  , deactivateProduct} = productController;
+import productController from "../controllers/productController.js";
+const { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, getProductsByUserId, deactivateProduct } = productController;
 
 /**
  *  get /products
@@ -14,32 +10,29 @@ const { getAllProducts, getProductById, createProduct,
  *  post/verifyToken/products
  *  update/verifyToken/products/:id
  *  delete/verifyToken/products/:id
- *
-
- * [
-  body("title").notEmpty().withMessage("post title is required"),
-  body("price").isNumeric().withMessage("Valid price is required"),
-  body("description").notEmpty().withMessage("Description is required"),
-],
  */
-  // Get all products
-  router.get("/products", getAllProducts);
+const router = Router();
+router.get("/products", getAllProducts);
+router.get("/products/:id", getProductById);
+router.get("/products/user/:userId", getProductsByUserId);
 
-  // Get single product
-  router.get("/products/:id", getProductById);
-  // Get products by user id
-  router.get("/products/user/:userId",  getProductsByUserId);
-  // Create product
-  router.post("/products",  createProduct);
-  // Update product
-  router.put("/products/:id", [
-  body("title").optional().notEmpty(),
-  body("price").optional().isNumeric(),
-  body("description").optional().notEmpty(),
-  ] , updateProduct);
-  // deactivate product
-  router.patch("/products/status/:id", deactivateProduct)
-// Delete product
-  router.delete("/products/:id", deleteProduct);
+// Create product with validation
+router.post("/products",  [
+  body("title").notEmpty().withMessage("Title is required"),
+  body("price").isNumeric().withMessage("Valid price is required"),
+  body("desc").notEmpty().withMessage("Description is required"),
+  body("category").notEmpty().withMessage("Category is required"),
+], createProduct);
+
+// Update product with validation
+router.put("/products/:id", [
+  body("title").optional().notEmpty().withMessage("Title is required"),
+  body("price").optional().isNumeric().withMessage("Valid price is required"),
+  body("desc").optional().notEmpty().withMessage("Description is required"),
+  body("category").optional().notEmpty().withMessage("Category is required"),
+], updateProduct);
+
+router.patch("/products/status/:id", deactivateProduct);
+router.delete("/products/:id", deleteProduct);
 
 export default router;

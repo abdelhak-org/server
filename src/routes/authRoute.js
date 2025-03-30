@@ -21,5 +21,11 @@ router.post(
 );
 router.post("/users/logout", authController.logout);
 
+router.post("/users/forgetPassword" , authController.forgetPassword)
+
+router.post("/users/resetPassword" , authController.resetPassword)
+
+
+
 
 export default  router

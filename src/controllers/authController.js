@@ -1,12 +1,11 @@
-// src/api/v1/auth/controller.js
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import User from '../models/user.js';
 import APIError from "../utils/apiError.js";
+import nodemailer from 'nodemailer'
 /**
  *  login controller
  *  logout controller
-
 */
 const authController = {
 
@@ -55,7 +54,7 @@ const authController = {
       next(error);
     }
   },
-  logout: (req, res) => {
+  logout: (_, res) => { // Replaced 'req' with '_' as it is unused
     try {
         res.clearCookie('ecobuy24_token', { httpOnly: true, secure: true, sameSite: 'Strict' });
         res.status(200).json({ success: true, message: 'Logged out successfully' });
@@ -63,42 +62,82 @@ const authController = {
         res.status(500).json({ success: false, message: 'Logout failed', error: error.message });
     }
 }  ,
-restPassword: async (req, res, next) => {
-const { email } = req.body;
-try{
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new APIError('User not found', 404);
+  forgetPassword:async (req, res) => {
+  try {
+      const { email } = req.body;
+      const user = await User.findOne({ email });
+
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      const resetToken = jwt.sign(
+        { id: user._id },
+        process.env.JWT_SECRET, // Use a different secret for password reset
+        { expiresIn: "15m" } // Token expires in 15 minutes
+      );
+
+      const transporter = nodemailer.createTransport({
+          // Configure your email provider (e.g., Gmail, SendGrid)
+          service: 'gmail',
+          auth: {
+              user: process.env.EMAIL,
+              pass: process.env.EMAIL_PASS,
+          },
+      });
+
+      const mailOptions = {
+          to: user.email ,
+          subject: 'Password Reset',
+          text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
+              `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
+              `http://localhost:5173/reset-password?token=${resetToken}\n\n` +
+
+              // `http://${req.headers.host}/reset-password?token=${resetToken}\n\n` +
+
+              `If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+      };
+
+      transporter.sendMail(mailOptions, (error, _) => { // Replaced 'info' with '_' as it is unused
+          if (error) {
+              console.error(error);
+              return res.status(500).json({ message: 'Error sending email' });
+          }
+          res.json({ message: 'Email sent' });
+      });
+       } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
   }
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: '10m',
-  });
 
-  const resetUrl = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/auth/resetpassword/${token}`;
+},
+resetPassword : async (req , res )=>{
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetUrl}.\nIf you didn't forget your password, please ignore this email!`;
+  try {
+    const { token, password } = req.body;
 
-  await sendEmail({
-    email: user.email,
-    subject: 'Your password reset token (valid for 10 min)',
-    message,
-  });
+     // Verify the JWT token
+     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+     if (!decoded) return res.status(400).json({ message: "Invalid or expired token" });
 
-  res.status(200).json({
-    success: true,
-    message: 'Token sent to email!',
-  });
+     // Find user by decoded ID
+     const user = await User.findById(decoded.id);
+     if (!user) return res.status(404).json({ message: "User not found" });
 
-}
-catch (error) {
-  next(error);
-}
+     // Hash the new password and update it
+     const salt = await bcrypt.genSalt(10);
+     user.password = await bcrypt.hash(password, salt);
+     await user.save();
 
+     res.json({ message: "Password successfully reset" });
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
 }
 
 
-};
 
+}
+
+}
 export default authController;

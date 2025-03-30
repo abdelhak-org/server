@@ -16,6 +16,13 @@ const router = Router();
 */
 // create user
 router.post("/users/signup",
+  [
+  body("email").isEmail().withMessage("Valid email is required"),
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
+  body("name").notEmpty().withMessage("Name is required"),
+],
   userController.signUp
 );
 // get users
@@ -29,7 +36,7 @@ router.get("/users", userController.getUsers);
 router.put("/users/:id", userController.updateUser);
 
 // delete user
-router.delete("/users/:id", userController.deleteUser);
+router.delete("/users/:id",verifyToken ,userController.deleteUser);
 
 // verifyuser
 router.get("/users/me",verifyToken, userController.me)
@@ -37,10 +44,3 @@ router.get("/users/me",verifyToken, userController.me)
 
 
 export default router;
-// [
-//   body("email").isEmail().withMessage("Valid email is required"),
-//   body("password")
-//     .isLength({ min: 6 })
-//     .withMessage("Password must be at least 6 characters"),
-//   body("name").notEmpty().withMessage("Name is required"),
-// ],

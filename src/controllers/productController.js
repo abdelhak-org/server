@@ -8,22 +8,18 @@ const productController = {
   createProduct: async (req, res, next) => {
     try {
       const token =  req.cookies.ecobuy24_token;
-      console.log(token)
       if (!token) return res.status(401).json({ message: "Access Denied" });
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
       const user = await User.findById(decoded.id);
       if (!user) {
-        console.log(user , "no user  from me endpoint")
         throw new APIError('No user found with this id', 404);
       }
-        console.log(user ,"user from createUser")
-
-        const newProduct = await Product.create({...req.body , userId:user._id , isActive: true, isAproved: true });
-      // res with new product
+      // Create new product
+       const newProduct = await Product.create({...req.body , userId:user._id , isActive: true, isAproved: true });
+      //res with new product
       res.status(201).json({
         success: true,
-         data: newProduct
+       data: newProduct
       });
 
     } catch (error) {
@@ -35,7 +31,6 @@ const productController = {
     getAllProducts: async (req, res, next) => {
       const { category = "", title = "", address = "", currentPage = 1, pageSize = 12, userId, isAproved, minPrice, maxPrice, sortBy="newest" } = req.query;
       const query = { isActive: true };
-
       // Build query object based on provided filters
       if (category) query.category = new RegExp(category, 'i');
       if (title) query.title = new RegExp(title, 'i');
@@ -44,9 +39,10 @@ const productController = {
       if (maxPrice) query.price = { ...query.price, $lte: maxPrice };
       if (userId) query.userId = userId;
       if (isAproved !== undefined) query.isAproved = isAproved;
+
       // Determine sort order based on sortBy parameter
       const sortOrder = { updatedAt: -1 }; // Default to newest first
-      if (sortBy === 'oldest') {
+       if (sortBy === 'oldest') {
         sortOrder.updatedAt = 1;
       } else if (sortBy === 'priceAsc') {
         sortOrder.price = 1;
@@ -76,7 +72,6 @@ const productController = {
           }
         });
       } catch (error) {
-        console.error("Error in getAllProducts:", error);
         next(error);
       }
 
@@ -88,7 +83,6 @@ const productController = {
     try {
       const products = await Product.find({ userId: userId }).sort({ createdAt: -1 })
       ;
-      console.log(`Found ${products?.length || 0} products for user ${userId}`);
       if (!products) {
         throw new APIError('Products not found', 404);
       }
@@ -110,7 +104,6 @@ const productController = {
         return next(new APIError('Product ID is required', 400));
       }
       const product = await Product.findById(id);
-      console.log(product, "product");
 
       if (!product) {
         throw new APIError('Product not found', 404);
@@ -145,7 +138,6 @@ const productController = {
   },
   // deactivate product
   deactivateProduct: async (req, res, next) => {
-     console.log(  req.params.id , "params")
     try {
       const product = await Product.findById(req.params.id);
 
@@ -166,7 +158,6 @@ const productController = {
   },
 // Delete product
   deleteProduct: async (req, res, next) => {
-    console.log(req.params.id , "params")
     try {
       const deletedProduct = await Product.findByIdAndDelete(req.params.id);
       if (!deletedProduct) {

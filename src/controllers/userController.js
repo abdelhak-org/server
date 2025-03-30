@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 import APIError from "../utils/apiError.js";
 import jwt from "jsonwebtoken"
-
 /**
  *  me controller to verify logged in user
  *  getUsers controller to get all users
@@ -99,13 +98,14 @@ const userController = {
 
   deleteUser: async (req, res, next) => {
     try {
-      const userId = req.params.id;
+      const userId = req.user._id;
+
       const user = await User.findById(userId);
       if (!user) {
         return next(new APIError("User not found", 404));
       }
 
-      await user.remove();
+      await User.deleteOne({ _id: userId });
 
       res.status(200).json({
         success: true,
