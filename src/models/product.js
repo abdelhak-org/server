@@ -32,7 +32,7 @@ const productSchema = new mongoose.Schema({
     type:String,
     required:false
   },
-  
+
   isActive: {
     type: Boolean,
     default: true,
@@ -48,3 +48,5 @@ const productSchema = new mongoose.Schema({
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;
+
+
